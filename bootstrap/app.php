@@ -12,6 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+// Define middleware groups
+        $middleware->web(append: [
+            // \Spatie\Permission\Middlewares\RoleMiddleware::class,
+            // \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        ]);
+
+        // Define route middleware aliases
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            // 'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
