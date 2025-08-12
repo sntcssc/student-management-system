@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\TransactionService;
-use App\Repositories\TransactionRepositoryInterface;
+use App\Repositories\Interfaces\TransactionRepositoryInterface;
 use Tests\TestCase;
 use Mockery;
 use App\Models\Transaction;

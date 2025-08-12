@@ -9,9 +9,17 @@ class EditPermission extends Component
 {
     public $permissionId, $name;
 
-    protected $rules = [
-        'name' => 'required|string|max:255|unique:permissions,name,{{permissionId}}',
-    ];
+    // protected $rules = [
+    //     'name' => 'required|string|max:255|unique:permissions,name,{{permissionId}}',
+    // ];
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255|unique:permissions,name,' . $this->permissionId,
+        ];
+    }
+
 
     public function mount($id, PermissionService $permissionService)
     {

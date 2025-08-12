@@ -10,10 +10,19 @@ class EditRole extends Component
 {
     public $roleId, $name, $permissions = [];
 
-    protected $rules = [
-        'name' => 'required|string|max:255|unique:roles,name,{{roleId}}',
-        'permissions' => 'array',
-    ];
+    // protected $rules = [
+    //     'name' => 'required|string|max:255|unique:roles,name,{{roleId}}',
+    //     'permissions' => 'array',
+    // ];
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255|unique:roles,name,' . $this->roleId,
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,name',
+        ];
+    }
 
     public function mount($id, RoleService $roleService)
     {
