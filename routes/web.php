@@ -24,8 +24,14 @@ use App\Livewire\Finance\TransactionList;
 use App\Livewire\Finance\CreateTransaction;
 use App\Livewire\Finance\EditTransaction;
 
+use App\Http\Controllers\Web\Fee\FeeController;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Artisan;
+
+
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return view('web.fee.verify');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -73,5 +79,66 @@ Route::middleware([LocaleMiddleware::class])->group(function () {
         return redirect()->back();
     })->name('set-locale');
 });
+
+Route::get('/fee/verify', [FeeController::class, 'showVerificationForm'])->name('fee.verify');
+Route::post('/fee/verify', [FeeController::class, 'verifyStudent'])->name('fee.verify.submit');
+Route::post('/fee/submit', [FeeController::class, 'submitFeePayment'])->name('fee.submit');
+Route::get('/fee/receipt/{id}', [FeeController::class, 'downloadReceiptPDF'])->name('fee.receipt');
+Route::get('/fee/confirmation/{id}', [FeeController::class, 'downloadConfirmationPDF'])->name('fee.confirmation');
+Route::get('/fee/attachment/{id}', [FeeController::class, 'viewAttachment'])->name('fee.attachment');
+Route::post('/fee/update-status/{id}', [FeeController::class, 'updateStatus'])->name('fee.update-status');
+Route::get('/fee/edit/{id}', [FeeController::class, 'editTransaction'])->name('fee.edit');
+Route::post('/fee/update/{id}', [FeeController::class, 'updateTransaction'])->name('fee.update');
+Route::get('/fee/export', [FeeController::class, 'export'])->name('fee.export');
+
+//Reoptimized class loader:
+Route::get('/optimize', function() {
+    $exitCode = Artisan::call('optimize');
+    return '<h1>Reoptimized class loader</h1>';
+});
+
+// Clear All at once
+
+Route::get('/clear', function() {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return "Cleared!";
+
+});
+
+// Link storage
+Route::get('/link-storage', function () {
+    $target = storage_path('app/public'); // Path to storage/app/public
+    $link = public_path('storage');       // Path to public/storage
+
+    if (!file_exists($link)) {
+        symlink($target, $link);
+        return "Storage linked successfully!";
+    }
+
+    return "Storage is already linked.";
+});
+
+# 📁 Serving Files from Storage in Laravel 12
+Route::get('/file-storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+
+    return Response::file($fullPath);
+})->where('path', '.*'); // <-- This allows slashes in {path}
+
+// $dbPath = 'fee_attachments/202610060_security_deposit_20250813_151911.jpg';
+
+// $url = url('/file-storage/' . $dbPath);
+
+// <a href="{{ url('/file-storage/' . $attachment->path) }}" target="_blank">Download</a>
 
 require __DIR__.'/auth.php';
